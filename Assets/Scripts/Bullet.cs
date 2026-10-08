@@ -18,28 +18,37 @@ public class Bullet : MonoBehaviour
 
         rb.collisionDetectionMode =
             CollisionDetectionMode2D.Continuous;
+
+        // O raio não deve ser destruído imediatamente
+        // ao nascer dentro de outro collider.
+        Collider2D meuCollider =
+            GetComponent<Collider2D>();
+
+        if (meuCollider != null)
+        {
+            meuCollider.isTrigger = true;
+        }
     }
 
     public void SetDirection(float dir)
     {
         direction = dir;
 
-        rb.linearVelocity =
-            new Vector2(
-                direction * speed,
-                0f
-            );
+        rb.linearVelocity = new Vector2(
+            direction * speed,
+            0f
+        );
 
-        Destroy(gameObject, 3f);
+        // O raio só desaparece depois de 5 segundos
+        Destroy(gameObject, 5f);
     }
 
     void FixedUpdate()
     {
-        rb.linearVelocity =
-            new Vector2(
-                direction * speed,
-                0f
-            );
+        rb.linearVelocity = new Vector2(
+            direction * speed,
+            0f
+        );
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -54,11 +63,6 @@ public class Bullet : MonoBehaviour
                 enemy.TakeHit(direction);
             }
 
-            Destroy(gameObject);
-        }
-
-        if (other.CompareTag("Ground"))
-        {
             Destroy(gameObject);
         }
     }

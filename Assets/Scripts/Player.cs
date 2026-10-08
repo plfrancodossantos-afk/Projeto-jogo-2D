@@ -150,11 +150,12 @@ public class Player : MonoBehaviour
 
     void AtualizarRaios()
     {
-        if (textoRaios != null)
-        {
-            textoRaios.text =
-                "Raios: " + raios;
-        }
+        if (textoRaios == null)
+            return;
+
+        textoRaios.gameObject.SetActive(true);
+
+        textoRaios.text = "Raios: " + raios;
     }
 
     public void TomarDano()

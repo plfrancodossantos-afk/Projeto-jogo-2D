@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 2129314814654733150}
   - component: {fileID: 1227951343267035255}
   - component: {fileID: 6581707842437541494}
-  - component: {fileID: 1068042851347977341}
   - component: {fileID: -1952998975989517653}
+  - component: {fileID: -3890247764003853381}
   m_Layer: 0
   m_Name: bullet 1
   m_TagString: Untagged
@@ -76,8 +76,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 671912433
-  m_SortingLayer: 0
+  m_SortingLayerID: -1584973843
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 532282208441007744, guid: f1e5cd142dc3eed4a8b89b6b579f49e1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -104,8 +104,8 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_AngularDamping: 0
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -115,21 +115,8 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
---- !u!114 &1068042851347977341
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4444845400964393856}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3746970551a063d4fa65df1c762f4bac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 12
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!58 &-1952998975989517653
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -166,3 +153,16 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 3.2300005
+--- !u!114 &-3890247764003853381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4444845400964393856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3746970551a063d4fa65df1c762f4bac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 12
