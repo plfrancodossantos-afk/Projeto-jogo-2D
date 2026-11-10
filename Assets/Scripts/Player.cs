@@ -223,4 +223,7 @@ public class Player : MonoBehaviour
             isGrounded = false;
         }
     }
-}
+
+    public MenuScene menu;
+
+}   
