@@ -4,90 +4,70 @@ using UnityEngine.SceneManagement;
 
 public class MenuScene : MonoBehaviour
 {
-    [Header("Painéis")]
     public GameObject painelPause;
     public GameObject painelGameOver;
 
-    private bool pausado = false;
-    private bool jogoAcabou = false;
+    bool pausado = false;
+    bool jogoAcabou = false;
 
     void Start()
     {
-        Time.timeScale = 1f;
-
-        pausado = false;
-        jogoAcabou = false;
-
-        if (painelPause != null)
-            painelPause.SetActive(false);
-
-        if (painelGameOver != null)
-            painelGameOver.SetActive(false);
+        painelPause.SetActive(false);
+        painelGameOver.SetActive(false);
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (jogoAcabou)
-                return;
-
             if (pausado)
+            {
                 Continuar();
+            }
             else
+            {
                 Pausar();
+            }
         }
     }
 
     public void Pausar()
     {
-        if (jogoAcabou)
-            return;
-
-        pausado = true;
-
-        if (painelPause != null)
+        if (!jogoAcabou)
+        {
+            pausado = true;
             painelPause.SetActive(true);
-
-        Time.timeScale = 0f;
+            Time.timeScale = 0f;
+        }
     }
 
     public void Continuar()
     {
-        if (jogoAcabou)
-            return;
-
         pausado = false;
-
-        if (painelPause != null)
-            painelPause.SetActive(false);
-
+        painelPause.SetActive(false);
         Time.timeScale = 1f;
     }
 
     public void MostrarGameOver()
     {
-        if (jogoAcabou)
-            return;
-
         jogoAcabou = true;
-        pausado = false;
-
-        if (painelPause != null)
-            painelPause.SetActive(false);
-
-        if (painelGameOver != null)
-            painelGameOver.SetActive(true);
-
+        painelGameOver.SetActive(true);
         Time.timeScale = 0f;
     }
 
     public void Reiniciar()
     {
         Time.timeScale = 1f;
-
-        SceneManager.LoadScene(
-            SceneManager.GetActiveScene().buildIndex
-        );
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-}
+    public void VoltarMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Menu");
+    }
+
+
+}   
+
+
+
