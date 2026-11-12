@@ -1,5 +1,5 @@
+
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 public class Player : MonoBehaviour
@@ -28,11 +28,15 @@ public class Player : MonoBehaviour
     [Header("Dano")]
     public float puloAoLevarDano = 5f;
 
+    [Header("Tela de Derrota")]
+    public MenuScene menuCena;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
     private bool isGrounded = false;
     private float direction = 1f;
+    private bool morreu = false;
 
     void Start()
     {
@@ -48,6 +52,9 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        if (morreu)
+            return;
+
         float move = Input.GetAxisRaw("Horizontal");
 
         rb.linearVelocity = new Vector2(
@@ -87,7 +94,7 @@ public class Player : MonoBehaviour
 
     void Atirar()
     {
-        if (raios <= 0)
+        if (morreu || raios <= 0)
         {
             Debug.Log("Você não tem mais raios!");
             return;
@@ -98,16 +105,12 @@ public class Player : MonoBehaviour
             Debug.LogWarning(
                 "Bullet Prefab não foi colocado no Player!"
             );
-
             return;
         }
 
         Vector2 spawnPosition =
             (Vector2)transform.position +
-            new Vector2(
-                direction * 0.7f,
-                0f
-            );
+            new Vector2(direction * 0.7f, 0f);
 
         GameObject bala = Instantiate(
             bulletPrefab,
@@ -115,8 +118,7 @@ public class Player : MonoBehaviour
             Quaternion.identity
         );
 
-        Bullet bulletScript =
-            bala.GetComponent<Bullet>();
+        Bullet bulletScript = bala.GetComponent<Bullet>();
 
         if (bulletScript != null)
         {
@@ -127,13 +129,14 @@ public class Player : MonoBehaviour
 
         AtualizarRaios();
 
-        Debug.Log(
-            "Raios restantes: " + raios
-        );
+        Debug.Log("Raios restantes: " + raios);
     }
 
     public void GanharRaios(int quantidade)
     {
+        if (morreu)
+            return;
+
         raios += quantidade;
 
         if (raios > maxRaios)
@@ -143,9 +146,7 @@ public class Player : MonoBehaviour
 
         AtualizarRaios();
 
-        Debug.Log(
-            "Raios: " + raios
-        );
+        Debug.Log("Raios: " + raios);
     }
 
     void AtualizarRaios()
@@ -154,16 +155,37 @@ public class Player : MonoBehaviour
             return;
 
         textoRaios.gameObject.SetActive(true);
-
         textoRaios.text = "Raios: " + raios;
     }
 
     public void TomarDano()
     {
-        if (vidas <= 0)
+        if (vidas <= 0 || morreu)
             return;
 
         vidas--;
+
+        AtualizarCoracoes();
+
+        if (vidas <= 0)
+        {
+            morreu = true;
+
+            rb.linearVelocity = Vector2.zero;
+
+            if (menuCena != null)
+            {
+                menuCena.MostrarGameOver();
+            }
+            else
+            {
+                Debug.LogError(
+                    "MenuCena não foi associado ao Player!"
+                );
+            }
+
+            return;
+        }
 
         rb.linearVelocity = new Vector2(
             rb.linearVelocity.x,
@@ -174,15 +196,6 @@ public class Player : MonoBehaviour
             Vector2.up * puloAoLevarDano,
             ForceMode2D.Impulse
         );
-
-        AtualizarCoracoes();
-
-        if (vidas <= 0)
-        {
-            SceneManager.LoadScene(
-                SceneManager.GetActiveScene().buildIndex
-            );
-        }
     }
 
     void AtualizarCoracoes()
@@ -223,7 +236,4 @@ public class Player : MonoBehaviour
             isGrounded = false;
         }
     }
-
-    public MenuScene menu;
-
-}   
+}

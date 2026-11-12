@@ -1,65 +1,93 @@
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public class MenuScene : MonoBehaviour
 {
+    [Header("Painéis")]
     public GameObject painelPause;
     public GameObject painelGameOver;
 
-    bool pausado = false;
-    bool jogoAcabou = false;
+    private bool pausado = false;
+    private bool jogoAcabou = false;
 
-    
     void Start()
     {
-        painelPause.SetActive(false);
-        painelGameOver.SetActive(false);
+        Time.timeScale = 1f;
+
+        pausado = false;
+        jogoAcabou = false;
+
+        if (painelPause != null)
+            painelPause.SetActive(false);
+
+        if (painelGameOver != null)
+            painelGameOver.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (jogoAcabou)
+                return;
+
             if (pausado)
-            {
-                Continuar();  
-            }
+                Continuar();
             else
-            {
                 Pausar();
-            }
         }
     }
-  
+
     public void Pausar()
     {
-      if(jogoAcabou == false)
-        {
-           pausado = true;
-            painelPause.SetActive(true);
-            Time.timeScale = 0f;
+        if (jogoAcabou)
+            return;
 
-        }
+        pausado = true;
+
+        if (painelPause != null)
+            painelPause.SetActive(true);
+
+        Time.timeScale = 0f;
     }
 
     public void Continuar()
     {
+        if (jogoAcabou)
+            return;
+
         pausado = false;
-        painelPause.SetActive(false) ;
+
+        if (painelPause != null)
+            painelPause.SetActive(false);
+
         Time.timeScale = 1f;
     }
 
     public void MostrarGameOver()
     {
+        if (jogoAcabou)
+            return;
+
         jogoAcabou = true;
-        painelGameOver.SetActive(true) ;
+        pausado = false;
+
+        if (painelPause != null)
+            painelPause.SetActive(false);
+
+        if (painelGameOver != null)
+            painelGameOver.SetActive(true);
+
         Time.timeScale = 0f;
     }
+
     public void Reiniciar()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().buildIndex
+        );
     }
-
 }
-
