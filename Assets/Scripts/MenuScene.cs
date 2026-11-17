@@ -7,13 +7,18 @@ public class MenuScene : MonoBehaviour
     public GameObject painelPause;
     public GameObject painelGameOver;
 
-    bool pausado = false;
-    bool jogoAcabou = false;
+    private bool pausado = false;
+    private bool jogoAcabou = false;
 
     void Start()
     {
-        painelPause.SetActive(false);
-        painelGameOver.SetActive(false);
+        Time.timeScale = 1f;
+
+        if (painelPause != null)
+            painelPause.SetActive(false);
+
+        if (painelGameOver != null)
+            painelGameOver.SetActive(false);
     }
 
     void Update()
@@ -21,37 +26,39 @@ public class MenuScene : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (pausado)
-            {
                 Continuar();
-            }
             else
-            {
                 Pausar();
-            }
         }
     }
 
     public void Pausar()
     {
-        if (!jogoAcabou)
-        {
-            pausado = true;
-            painelPause.SetActive(true);
-            Time.timeScale = 0f;
-        }
+        if (jogoAcabou || painelPause == null)
+            return;
+
+        pausado = true;
+        painelPause.SetActive(true);
+        Time.timeScale = 0f;
     }
 
     public void Continuar()
     {
         pausado = false;
-        painelPause.SetActive(false);
+
+        if (painelPause != null)
+            painelPause.SetActive(false);
+
         Time.timeScale = 1f;
     }
 
     public void MostrarGameOver()
     {
         jogoAcabou = true;
-        painelGameOver.SetActive(true);
+
+        if (painelGameOver != null)
+            painelGameOver.SetActive(true);
+
         Time.timeScale = 0f;
     }
 
@@ -60,14 +67,10 @@ public class MenuScene : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
     public void VoltarMenu()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene("Menu");
     }
-
-
-}   
-
-
-
+}

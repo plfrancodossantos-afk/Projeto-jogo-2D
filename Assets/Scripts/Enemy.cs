@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -6,7 +7,7 @@ public class Enemy : MonoBehaviour
     public float speed = 1f;
 
     [Header("Vida")]
-    public int vida = 3;
+    public int vida = 1;
 
     [Header("Empurrão")]
     public float knockback = 5f;
@@ -14,6 +15,7 @@ public class Enemy : MonoBehaviour
 
     private Rigidbody2D rb;
     private Transform player;
+    private bool morto = false;
 
     void Start()
     {
@@ -23,21 +25,17 @@ public class Enemy : MonoBehaviour
             GameObject.FindGameObjectWithTag("Player");
 
         if (p != null)
-        {
             player = p.transform;
-        }
     }
 
     void FixedUpdate()
     {
-        if (player == null)
+        if (player == null || morto)
             return;
 
-        float dir =
-            Mathf.Sign(
-                player.position.x -
-                transform.position.x
-            );
+        float dir = Mathf.Sign(
+            player.position.x - transform.position.x
+        );
 
         rb.linearVelocity = new Vector2(
             dir * speed,
@@ -47,38 +45,39 @@ public class Enemy : MonoBehaviour
 
     public void TakeHit(float dir)
     {
+        if (morto)
+            return;
+
         vida--;
 
-        rb.linearVelocity = Vector2.zero;
-
-        rb.AddForce(
-            new Vector2(
-                dir * knockback,
-                knockbackUp
-            ),
-            ForceMode2D.Impulse
-        );
+        Debug.Log("Zumbi atingido! Vida: " + vida);
 
         if (vida <= 0)
         {
+            morto = true;
+
+            Debug.Log("ZUMBI DERROTADO!");
+
+            MenuManage gerente = MenuManage.Instance;
+
+            if (gerente == null)
+                gerente = FindFirstObjectByType<MenuManage>();
+
+            if (gerente != null)
+                gerente.RegistrarAbate();
+            else
+                Debug.LogError("MenuManage não encontrado!");
+
             Player jogador =
                 FindFirstObjectByType<Player>();
 
             if (jogador != null)
             {
-                // Sorteia de 0 até 5 raios
-                int raiosGanhos =
-                    Random.Range(0, 6);
+                int raiosGanhos = Random.Range(0, 6);
 
-                jogador.GanharRaios(
-                    raiosGanhos
-                );
+                jogador.GanharRaios(raiosGanhos);
 
-                Debug.Log(
-                    "Zumbi morto! Você ganhou " +
-                    raiosGanhos +
-                    " raios."
-                );
+                Debug.Log("Raios ganhos: " + raiosGanhos);
             }
 
             ZombieSpawner spawner =
@@ -87,12 +86,16 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject);
 
             if (spawner != null)
-            {
-                spawner.Invoke(
-                    "SpawnWave",
-                    0.1f
-                );
-            }
+                spawner.Invoke("SpawnWave", 0.1f);
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+
+            rb.AddForce(
+                new Vector2(dir * knockback, knockbackUp),
+                ForceMode2D.Impulse
+            );
         }
     }
 }

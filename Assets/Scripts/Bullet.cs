@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -6,6 +7,7 @@ public class Bullet : MonoBehaviour
 
     private float direction = 1f;
     private Rigidbody2D rb;
+    private bool jaAtingiu = false;
 
     void Awake()
     {
@@ -19,15 +21,11 @@ public class Bullet : MonoBehaviour
         rb.collisionDetectionMode =
             CollisionDetectionMode2D.Continuous;
 
-        // O raio não deve ser destruído imediatamente
-        // ao nascer dentro de outro collider.
         Collider2D meuCollider =
             GetComponent<Collider2D>();
 
         if (meuCollider != null)
-        {
             meuCollider.isTrigger = true;
-        }
     }
 
     public void SetDirection(float dir)
@@ -39,28 +37,36 @@ public class Bullet : MonoBehaviour
             0f
         );
 
-        // O raio só desaparece depois de 5 segundos
         Destroy(gameObject, 5f);
     }
 
     void FixedUpdate()
     {
-        rb.linearVelocity = new Vector2(
-            direction * speed,
-            0f
-        );
+        if (rb != null)
+        {
+            rb.linearVelocity = new Vector2(
+                direction * speed,
+                0f
+            );
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (jaAtingiu)
+            return;
+
         if (other.CompareTag("Enemy"))
         {
+            jaAtingiu = true;
+
             Enemy enemy =
-                other.GetComponent<Enemy>();
+                other.GetComponentInParent<Enemy>();
 
             if (enemy != null)
             {
-                enemy.TakeHit(direction);
+                // Um único tiro elimina o zumbi.
+                enemy.TakeHit(1000f);
             }
 
             Destroy(gameObject);
