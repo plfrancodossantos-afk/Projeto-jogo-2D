@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be4b8a6abbde4d14eac7526460dbc231, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  vida: 1
+  speed: 4
+  vida: 2
   knockback: 5
   knockbackUp: 3

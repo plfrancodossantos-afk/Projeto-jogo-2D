@@ -1,239 +1,208 @@
 
 using UnityEngine;
-using TMPro;
+using TMPro; 
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour 
 {
-    [Header("Movimento")]
-    public float speed = 5f;
-    public float jumpForce = 7f;
+    public float speed = 5f; //a velocidade de movimento
+    public float jumpForce = 7f; //força do pulo
 
-    [Header("Tiro")]
-    public GameObject bulletPrefab;
+    public GameObject bulletPrefab; //guarda o prefab do raio disparado
 
-    public int raios = 15;
-    public int maxRaios = 20;
+    public int raios = 15; //a quantidade inicial de raios
+    public int maxRaios = 20; //o limite máximo de raios
 
-    [Header("Contador de Raios")]
-    public TextMeshProUGUI textoRaios;
+    public TextMeshProUGUI textoRaios; //o texto q mostra a quantidade de raios
 
-    [Header("Vida")]
-    public int vidas = 4;
+    public int vidas = 4; //define a quantidade de vidas do jogador
 
-    public GameObject coracao1;
-    public GameObject coracao2;
-    public GameObject coracao3;
-    public GameObject coracao4;
+    public GameObject coracao1; //primeira imagem de coração
+    public GameObject coracao2; //segunda imagem de coração
+    public GameObject coracao3; //terceira imagem de coração
+    public GameObject coracao4; // quarta imagem de coração
 
-    [Header("Dano")]
-    public float puloAoLevarDano = 5f;
+    public float puloAoLevarDano = 5f; //força do pulo ao receber dano
 
-    [Header("Tela de Derrota")]
-    public MenuScene menuCena;
+    public MenuScene menuCena; //controlador da tela de Game Over
 
-    private Rigidbody2D rb;
-    private SpriteRenderer sr;
+    private Rigidbody2D rb; // Guarda o Rigidbody2D do jogador
+    private SpriteRenderer sr; // Guarda o componente responsável pela imagem do jogador
 
-    private bool isGrounded = false;
-    private float direction = 1f;
-    private bool morreu = false;
+    private bool isGrounded = false; //fala se o jogador está no chão
+    private float direction = 1f; // Guarda a direção para a qual o jogador está olhando
+    private bool morreu = false; // player n pode fazer nada  depois q morre
 
-    void Start()
+    void Start() // Executa quando o jogador aparece na cena
     {
-        rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>(); // Obtém o Rigidbody2D do jogador
+        sr = GetComponent<SpriteRenderer>(); // Obtém o SpriteRenderer do jogador
 
-        vidas = 4;
-        raios = 15;
+        vidas = 4; // Reinicia as vidas
+        raios = 15; // Reinicia a quantidade de raios
 
-        AtualizarCoracoes();
-        AtualizarRaios();
+        AtualizarCoracoes(); // atualiza as imagens dos corações
+        AtualizarRaios(); // atualiza o contador de raios
     }
 
     void Update()
     {
-        if (morreu)
-            return;
+        if (morreu) // vê se o jogador já morreu
+            return; // impede que ele continue se movimentando ou atirando
 
-        float move = Input.GetAxisRaw("Horizontal");
+        float move = Input.GetAxisRaw("Horizontal"); // lê os comandos de movimento horizontal
 
-        rb.linearVelocity = new Vector2(
-            move * speed,
-            rb.linearVelocity.y
-        );
+        rb.linearVelocity = new Vector2(move * speed, rb.linearVelocity.y); // Move o jogador sem alterar sua velocidade vertical
 
-        if (move > 0)
+        if (move > 0) // vê se o jogador está andando para a direita
         {
-            sr.flipX = false;
-            direction = 1f;
+            sr.flipX = false; // mantém o personagem olhando para a direita
+            direction = 1f; // define a direção do disparo para a direita
         }
-        else if (move < 0)
+        else if (move < 0) // verifica se o jogador está andando para a esquerda
         {
-            sr.flipX = true;
-            direction = -1f;
+            sr.flipX = true; // vai vira o personagem para a esquerda
+            direction = -1f; // faz o disparo ir para a esquerda
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) // verifica se apertou Espaço estando no chão
         {
-            rb.linearVelocity = new Vector2(
-                rb.linearVelocity.x,
-                0f
-            );
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f); // zera a velocidade vertical antes do pulo
 
-            rb.AddForce(
-                Vector2.up * jumpForce,
-                ForceMode2D.Impulse
-            );
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse); // aplica a força do pulo
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E)) // verifica se apertou a tecla E
         {
-            Atirar();
+            Atirar(); // executa o disparo
         }
     }
 
-    void Atirar()
+    void Atirar() // controla o disparo dos raios
     {
-        if (morreu || raios <= 0)
+        if (morreu || raios <= 0) //verifica se o jogador morreu ou está sem raios
         {
-            Debug.Log("Você não tem mais raios!");
-            return;
+            Debug.Log("Você não tem mais raios!"); // vai avisar no console quando os raios acabar
+            return; // n vai deixar o player atirar mais
         }
 
-        if (bulletPrefab == null)
+        if (bulletPrefab == null) // verifica se o prefab do raio foi associado
         {
-            Debug.LogWarning(
-                "Bullet Prefab não foi colocado no Player!"
-            );
-            return;
+            Debug.LogWarning("Bullet Prefab não foi colocado no Player!"); // mostra um aviso no Console
+            return; // Cancela o disparo
         }
 
-        Vector2 spawnPosition =
-            (Vector2)transform.position +
-            new Vector2(direction * 0.7f, 0f);
+        Vector2 spawnPosition = (Vector2)transform.position + new Vector2(direction * 0.7f, 0f); // calcula onde o raio deve aparecer
 
-        GameObject bala = Instantiate(
-            bulletPrefab,
-            spawnPosition,
-            Quaternion.identity
-        );
+        GameObject bala = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity); // cria o raio na posição calculada
 
-        Bullet bulletScript = bala.GetComponent<Bullet>();
+        Bullet bulletScript = bala.GetComponent<Bullet>(); // obtém o script Bullet do raio criado
 
-        if (bulletScript != null)
+        if (bulletScript != null) // verifica se o raio possui o script
         {
-            bulletScript.SetDirection(direction);
+            bulletScript.SetDirection(direction); //define para qual lado o raio vai
         }
 
-        raios--;
+        raios--; //diminui um raio do contador
 
-        AtualizarRaios();
+        AtualizarRaios(); // atualiza o contador de raios
 
-        Debug.Log("Raios restantes: " + raios);
+        Debug.Log("Raios restantes: " + raios); // mostra a quantidade restante no Console
     }
 
-    public void GanharRaios(int quantidade)
+    public void GanharRaios(int quantidade) // recebe raios como recompensa
     {
-        if (morreu)
-            return;
+        if (morreu) // verifica se o jogador morreu
+            return; // impede do jogador receber os raios dps q morre
 
-        raios += quantidade;
+        raios += quantidade; // adiciona os raios recebidos
 
-        if (raios > maxRaios)
+        if (raios > maxRaios) // verifica se ultrapassou o limite
         {
-            raios = maxRaios;
+            raios = maxRaios; // limita a quantidade ao máximo permitido
         }
 
-        AtualizarRaios();
+        AtualizarRaios(); // atualiza o contador de raios na tela
 
-        Debug.Log("Raios: " + raios);
+        Debug.Log("Raios: " + raios); // mostra a quantidade atual no Console
     }
 
-    void AtualizarRaios()
+    void AtualizarRaios() // atualiza o texto dos raios
     {
-        if (textoRaios == null)
-            return;
+        if (textoRaios == null) // verifica se o texto foi associado
+            return; // interrompe se não encontrar o texto
 
-        textoRaios.gameObject.SetActive(true);
-        textoRaios.text = "Raios: " + raios;
+        textoRaios.gameObject.SetActive(true); // garante que o contador esteja visível
+        textoRaios.text = "Raios: " + raios; // mostra a quantidade atual de raios
     }
 
-    public void TomarDano()
+    public void TomarDano() //executa quando o jogador recebe um ataque
     {
-        if (vidas <= 0 || morreu)
-            return;
+        if (vidas <= 0 || morreu) //verifica se já está sem vidas ou morreu
+            return; //impede receber dano novamente
 
-        vidas--;
+        vidas--; //diminui uma vida
 
-        AtualizarCoracoes();
+        AtualizarCoracoes(); //atualiza as imagens dos corações
 
-        if (vidas <= 0)
+        if (vidas <= 0) //verifica se todas as vidas acabaram
         {
-            morreu = true;
+            morreu = true; //marca o jogador como morto
 
-            rb.linearVelocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero; //interrompe o movimento do jogador
 
-            if (menuCena != null)
+            if (menuCena != null) //verifica se o controlador de menu foi associado
             {
-                menuCena.MostrarGameOver();
+                menuCena.MostrarGameOver(); //mostra a tela de derrota
             }
-            else
+            else //executa se o controlador não foi encontrado
             {
-                Debug.LogError(
-                    "MenuCena não foi associado ao Player!"
-                );
+                Debug.LogError("MenuCena não foi associado ao Player!"); //mostra um erro no console
             }
 
-            return;
+            return; //encerra a função.
         }
 
-        rb.linearVelocity = new Vector2(
-            rb.linearVelocity.x,
-            0f
-        );
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f); //zera a velocidade vertical antes do impulso
 
-        rb.AddForce(
-            Vector2.up * puloAoLevarDano,
-            ForceMode2D.Impulse
-        );
+        rb.AddForce(Vector2.up * puloAoLevarDano, ForceMode2D.Impulse); //faz o jogador pular ao receber dano
     }
 
-    void AtualizarCoracoes()
+    void AtualizarCoracoes() //atualiza os corações conforme as vidas restantes
     {
-        if (coracao1 != null)
-            coracao1.SetActive(vidas >= 1);
+        if (coracao1 != null) //verifica se o primeiro coração existe
+            coracao1.SetActive(vidas >= 1); //mostra o primeiro coração se houver pelo menos uma vida
 
-        if (coracao2 != null)
-            coracao2.SetActive(vidas >= 2);
+        if (coracao2 != null) //verifica se o segundo coração existe
+            coracao2.SetActive(vidas >= 2); //mostra o segundo coração se houver pelo menos duas vidas
 
-        if (coracao3 != null)
-            coracao3.SetActive(vidas >= 3);
+        if (coracao3 != null) // verifica se o terceiro coração existe
+            coracao3.SetActive(vidas >= 3); //mostra o terceiro coração se houver pelo menos três vidas
 
-        if (coracao4 != null)
-            coracao4.SetActive(vidas >= 4);
+        if (coracao4 != null) //verifica se o quarto coração existe
+            coracao4.SetActive(vidas >= 4); // mostra o quarto coração se houver quatro vidas
     }
 
-    void OnCollisionStay2D(Collision2D collision)
+    void OnCollisionStay2D(Collision2D collision) // ve rifica os objetos que continuam em contato com o jogador
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground")) // verifica se o jogador está tocando o chão
         {
-            isGrounded = true;
+            isGrounded = true; // permite que o jogador pule
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision) // detecta quando o jogador encosta em outro objeto
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy")) // verifica se encostou em um zumbi
         {
-            TomarDano();
+            TomarDano(); // retira uma vida do jogador
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+    void OnCollisionExit2D(Collision2D collision) // detecta quando o jogador deixa de tocar em um objeto
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground")) // verifica se saiu do chão
         {
-            isGrounded = false;
+            isGrounded = false; // impede que o jogador pule no ar
         }
     }
 }

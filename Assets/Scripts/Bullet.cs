@@ -1,75 +1,53 @@
 
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : MonoBehaviour 
 {
-    public float speed = 12f;
+    public float speed = 12f; //a velocidade do raio
 
-    private float direction = 1f;
-    private Rigidbody2D rb;
-    private bool jaAtingiu = false;
+    private float direction = 1f; //guard a direção do disparo
+    private Rigidbody2D rb; //guarda o Rigidbody2D do raio
+    private bool jaAtingiu = false; //impede que o raio acerte mais de um inimigo
 
-    void Awake()
+    void Awake() // executa quando o raio é criado
     {
-        rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>(); // obtém o rigidbody2D do raio
 
-        rb.gravityScale = 0f;
-        rb.linearDamping = 0f;
-        rb.angularDamping = 0f;
-        rb.freezeRotation = true;
+        rb.gravityScale = 0f; // desativa a gravidade
+        rb.linearDamping = 0f; // remove a resistência ao movimento
+        rb.angularDamping = 0f; // remove a resistência à rotação
+        rb.freezeRotation = true; // impede que o raio gire
 
-        rb.collisionDetectionMode =
-            CollisionDetectionMode2D.Continuous;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; //melhora a detecção de colisões
 
-        Collider2D meuCollider =
-            GetComponent<Collider2D>();
+        Collider2D col = GetComponent<Collider2D>(); //obtem o Collider do raio
 
-        if (meuCollider != null)
-            meuCollider.isTrigger = true;
+        if (col != null) // verifica se o collider existe
+            col.isTrigger = true; //permite detectar o contato com inimigos
     }
 
-    public void SetDirection(float dir)
+    public void SetDirection(float dir) // recebe a direção do disparo
     {
-        direction = dir;
+        direction = dir; //guarda a direção recebida
 
-        rb.linearVelocity = new Vector2(
-            direction * speed,
-            0f
-        );
+        rb.linearVelocity = new Vector2(direction * speed, 0f); // faz o raio se movimentar horizontalmente
 
-        Destroy(gameObject, 5f);
+        Destroy(gameObject, 5f); // destrói o raio após 5 segundos
     }
 
-    void FixedUpdate()
+    void OnTriggerEnter2D(Collider2D other) // detecta quando o raio toca outro objeto
     {
-        if (rb != null)
+        if (jaAtingiu) return; // impede que o raio acerte novamente
+
+        Enemy enemy = other.GetComponentInParent<Enemy>(); // procura o script enemy no objeto atingido 
+
+        if (enemy != null) // erifica se o objeto atingido é um zumbi
         {
-            rb.linearVelocity = new Vector2(
-                direction * speed,
-                0f
-            );
-        }
-    }
+            jaAtingiu = true; // marca que o raio já atingiu um inimigo
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (jaAtingiu)
-            return;
+            enemy.TakeHit(direction); //aplica o impacto na direção correta
 
-        if (other.CompareTag("Enemy"))
-        {
-            jaAtingiu = true;
-
-            Enemy enemy =
-                other.GetComponentInParent<Enemy>();
-
-            if (enemy != null)
-            {
-                // Um único tiro elimina o zumbi.
-                enemy.TakeHit(1000f);
-            }
-
-            Destroy(gameObject);
+            Destroy(gameObject); // destrói o raio após atingir o zumbi
         }
     }
 }

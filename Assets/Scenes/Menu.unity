@@ -300,6 +300,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f46c69515be8d1f4cb6f6b44de67aac7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  telaProximaFase: {fileID: 0}
+  guitarra: {fileID: 0}
 --- !u!1 &1003654117
 GameObject:
   m_ObjectHideFlags: 0
